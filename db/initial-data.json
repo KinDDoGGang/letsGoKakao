@@ -1,0 +1,114 @@
+{
+    "templates": [
+        { 
+            "id": "permission-request",
+            "label": "권한 요청",
+            "steps": [
+                { "label": "승인 요청", "key": "APPROVAL_REQUESTED", "actionLabel": "승인" },
+                { "label": "권한 처리 중", "key": "IN_PROGRESS", "actionLabel": "권한 부여" },
+                { "label": "처리 완료", "key": "DONE" }
+            ], 
+            "fields": [
+                { 
+                    "type": "username",
+                    "key": "targetUsername",
+                    "label": "부여 대상 사용자",
+                    "validation": {
+                        "required": true,
+                        "maxLength": 100,
+                        "minLength": 1
+                    }
+                }, { 
+                    "type": "richtext",
+                    "key": "details",
+                    "label": "요청 내용 상세",
+                    "validation": {
+                        "required": false,
+                        "maxLength": 500,
+                        "minLength": 0
+                    }
+                }, { 
+                    "type": "date",
+                    "key": "date",
+                    "label": "처리 희망일",
+                    "validation": {
+                        "required": true
+                    }
+                }
+            ]
+        }, { 
+            "id": "firewall-request",
+            "label": "방화벽 설정 요청",
+            "steps": [
+                { "label": "승인 요청", "key": "APPROVAL_REQUESTED", "actionLabel": "승인" },
+                { "label": "정책 검토", "key": "CHECKING_POLICY", "actionLabel": "정책 검토 완료" },
+                { "label": "방화벽 설정", "key": "SETTING", "actionLabel": "설정 완료" },
+                { "label": "설정 완료", "key": "DONE" }
+            ], 
+            "fields": [
+                { 
+                    "type": "text",
+                    "key": "source",
+                    "label": "출발지 IP",
+                    "validation": {
+                        "required": true,
+                        "regexp": "^\\d{1,3}(\\.\\d{1,3}){3}$"
+                    }
+                }, { 
+                    "type": "text",
+                    "key": "destination",
+                    "label": "도착지 IP",
+                    "validation": {
+                        "required": true,
+                        "regexp": "^\\d{1,3}(\\.\\d{1,3}){3}$"
+                    }
+                }
+            ]
+        }
+    ],
+    "requests": [
+        { 
+            "templateId": "permission-request",
+            "currentStepKey": "APPROVAL_REQUESTED",
+            "requestedBy": "tester",
+            "steps": [
+                { "label": "승인 요청", "key": "APPROVAL_REQUESTED", "actionLabel": "승인",  "assignee": "brilliant" },
+                { "label": "권한 처리 중", "key": "IN_PROGRESS", "actionLabel": "권한 부여", "assignee": "banana" },
+                { "label": "처리 완료", "key": "DONE" }
+            ],
+            "title": "권한 부여 요청드립니다.",
+            "data": {
+                "targetUsername": "tester",
+                "details": "사용자 조회 권한 요청 드립니다.",
+                "date": "2022-11-21"
+            }
+        }, {
+            "templateId": "firewall-request",
+            "currentStepKey": "APPROVAL_REQUESTED",
+            "requestedBy": "tester",
+            "steps": [
+                { "label": "승인 요청", "key": "APPROVAL_REQUESTED", "actionLabel": "승인", "assignee": "newton" },
+                { "label": "정책 검토", "key": "CHECKING_POLICY", "actionLabel": "정책 검토 완료", "assignee": "marinabay" },
+                { "label": "방화벽 설정", "key": "SETTING", "actionLabel": "설정 완료", "assignee": "journey" },
+                { "label": "처리 완료", "key": "DONE" }
+            ],
+            "title": "방화벽 설정 요청드립니다.",
+            "data": {
+                "source": "1.2.3.4",
+                "destination": "5.6.7.8"
+            }
+        }
+    ],
+    "users": [
+        { "id": "tester", "password": "tester" },
+        { "id": "brilliant", "password": "brilliant" },
+        { "id": "banana", "password": "banana" },
+        { "id": "newton", "password": "newton" },
+        { "id": "marinabay", "password": "marinabay" },
+        { "id": "journey", "password": "journey" },
+        { "id": "somi", "password": "somi" },
+        { "id": "junior", "password": "junior" },
+        { "id": "venti", "password": "venti" },
+        { "id": "rick", "password": "rick" }
+    ]
+}
