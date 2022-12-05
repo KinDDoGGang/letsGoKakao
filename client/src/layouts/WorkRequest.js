@@ -32,13 +32,15 @@ export default function WorkRequest() {
     const selectWorkRequestList = async () => {
         const token = localStorage.getItem('login-token') || '';
         const result = await callAuthApi("http://127.0.0.1:8080/api/requests", "GET", {}, token);
+        
+        console.log('result workRequestList >>', result)
+
         const columns = makeWorkRequestListColumn();
 
         /* 아무것도 없을 때 noRows */
         if ( (result['content'] || [] ).length > 0 ){
             const rows = makeWorkRequestListRows(result['content']);
-    
-            console.log('workRequestList', result);
+            console.log('result rows', rows);
     
             setWorkRequestList({ columns, rows, totList: result});
         } else {

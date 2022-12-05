@@ -32,6 +32,9 @@ import { callAuthApi, getToday } from "../utils/utils";
 
 /** TODO 시간되면 상단에 로그인한 사용자명 표시해줘도 좋을 듯, 로그아웃버튼 추가하고 */
 /*  TODO Enter 칠 때, 요청서 제출버튼 클릭되도록 수정 필요 */
+/*  TODO 요청서 제출 후 다른 아이디로 로그인해서 들어와도 작성했던 요청서 남아있음, 그거로 로그인한 사용자가
+    요청목록에서 들어갔을 때, 담당자가 본인이면 해당 스탭에 해당하는 권한의 버튼값 활성/비활성 처리 해야할듯
+*/
 
 /* step 밑에 dropdownbox 추가 */
 const permissionSteps = ["승인 요청", "처리 중", "처리 완료"];
@@ -173,7 +176,8 @@ export default function WorkRequestForm() {
     const token = localStorage.getItem("login-token")
     try {
       const result = await callAuthApi("http://127.0.0.1:8080/api/requests", "POST",  param, token);
-      
+      console.log('requestForm Result', result);
+
       // 결과값이 존재하지 않을 경우
       if (  result && (result.id || '')  === '') {
         setAlertFlag({
@@ -188,6 +192,10 @@ export default function WorkRequestForm() {
           ,backgroundColor: '#1565c0'
           ,message: '요청서를 성공적으로 제출하였습니다.'
         });
+
+        /* 성공적으로 제출 후 요청목록 페이지로 이동해서 작성된 리스트 확인할 수 있도록 이동 + 데이터 가져가기 */
+        /* 각 단계에 맞는 사용자로 로그인 했을 경우 승인/권한부여 버튼 노출되도록 처리 필요할듯 */
+
       }
     } catch(e) {
       console.error(e);
