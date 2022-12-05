@@ -7,12 +7,13 @@ import Snackbar from "@mui/material/Snackbar";
 import Select from "@mui/material/Select";
 
 export default function CustomDropdownList({
-  size,
-  TemplateList,
-  placeText,
-  mSize,
-  callback,
-  dropdownRef,
+  size
+  ,TemplateList
+  ,placeText
+  ,mSize
+  ,callback
+  ,dropdownRef
+  ,isDisabled=false
 }) {
   const [template, setTemplate] = useState("");
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -34,18 +35,20 @@ export default function CustomDropdownList({
           sx={{
             "& > :not(style)": { m: mSize },
           }}
+          disabled={isDisabled}
         >
+          {/* 현재 양식요청 Object, 사용자명 조회하는 string 타입으로 나뉘어짐 */}
           {(TemplateList || []).length > 0 && typeof TemplateList[0] == "object"
             ? (TemplateList || []).map((v, i) => {
                 return (
-                  <MenuItem value={i + 1} name={v.id}>
+                  <MenuItem value={ `${i + 1},${v.id}`} name={v.id}>
                     {v.label}
                   </MenuItem>
                 );
               })
             : (TemplateList || []).map((v, i) => {
                 return (
-                  <MenuItem value={i + 1} name={v}>
+                  <MenuItem value={ `${i + 1},${v}` } name={v}>
                     {v}
                   </MenuItem>
                 );

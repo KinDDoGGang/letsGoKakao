@@ -4,20 +4,25 @@ import axios from "axios";
 export function callAuthApi(api, methodType, params, token) {
   return new Promise((resolve, reject) => {
     let result = {};
+    let data = {
+        method: methodType,
+        headers: { 
+            "content-type": "application/json",
+            "Authorization": token
+        }
+    };
+    if (methodType === "POST") {
+      data.body = JSON.stringify(params);
+    }
+
     try {
-        fetch(api, {
-            method: methodType,
-            headers: { 
-              "content-type": "application/json",
-              "Authorization": token
-            }
-        })
+        fetch(api,data)
         .then((res) => res.json())
         .then((json) => {
           if (json.status !== 200) {
             result = json;
-          }
-          resolve(json);
+          } 
+            resolve(json);
         });
     } catch (error) {
         result = error;
@@ -27,7 +32,7 @@ export function callAuthApi(api, methodType, params, token) {
         console.log('api call end');
     }
     return result;
-  });
+  })
 }
 
 export function callApi(api,params) {
