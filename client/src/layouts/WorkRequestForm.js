@@ -3,11 +3,8 @@ import { useOutletContext, useNavigate, useLocation } from "react-router-dom";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
-import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
-import Icon from "@mui/material/Icon";
-import Divider from "@mui/material/Divider";
-import Fade from "@mui/material/Fade";
+
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -33,6 +30,7 @@ import CustomInput from "../components/CustomInput/CustomInput";
 import CustomLogout from "../components/CustomLogout/CustomLogout";
 
 import AddressForm from "../layouts/AddresForm";
+import FirewallForm from "../layouts/FirewallForm";
 
 import {
   callAuthApi,
@@ -40,6 +38,7 @@ import {
   makeWorkRequestListColumn,
   makeWorkRequestListRows,
 } from "../utils/utils";
+
 
 /** TODO 시간되면 상단에 로그인한 사용자명 표시해줘도 좋을 듯, 로그아웃버튼 추가하고 */
 /*  TODO Enter 칠 때, 요청서 제출버튼 클릭되도록 수정 필요 후순위 */
@@ -82,6 +81,14 @@ export default function WorkRequestForm() {
     managerRef: useRef(),
     giveUserRef: useRef(),
     wantDateRef: useRef(),
+
+    // 방화벽 설정 부분
+    approvalRef: useRef()
+    , reviewerRef : useRef()
+    , firewallRef: useRef()
+    , destinationRef: useRef()
+    , sourceRef : useRef()
+
   };
 
   const [activeStep, setActiveStep] = useState(0);
@@ -104,6 +111,24 @@ export default function WorkRequestForm() {
   // 처리 희망일
   const [selectedWantDate, setSelectedWantDate] = useState(getToday());
 
+  // 방화벽 승인 담당자 ID, 이름
+  const [selectedApproval, setSelectedApproval] = useState("99");
+  const [selectedApprovalName, setSelectedApprovalName] = useState("");
+
+  // 방화벽 정책 담당자
+  const [selectedReviewer, setSelectedReviewer] = useState("99");
+  const [selectedReviewerName, setSelectedReviewerName] = useState("");
+
+  // 방화벽 설정 담당자
+  const [selectedFirewall, setSelectedFirewall] = useState("99");
+  const [selectedFirewallName, setSelectedFirewallName] = useState("");
+
+  // 출발지 IP
+  const [selectedDestination, setSelectedDestination ] = useState('');
+  // 도착지 IP
+  const [selectedSource, setSelectedSource ] = useState('');
+
+
   const { templateList, userList } = useOutletContext();
 
   const [AlertFlag, setAlertFlag] = useState({
@@ -114,10 +139,159 @@ export default function WorkRequestForm() {
 
   const pages = ["HOME / ", "요청하기"];
   
-  
-  const handleApprove = (event) => {
-    alert(event);
+  /* 권한부여 스탭 */
+  const handleProgress = async () => {
+    const token = localStorage.getItem('login-token');
+    const id = location.state.id || 1;
+    
+    try {
+        const result = await callAuthApi( `http://127.0.0.1:8080/api/requests/${id}/next`, "PATCH", {}, token );
+        
+        /* 권한처리 스탭으로 이동 */
+        if ((result.currentStepKey || '' ) !== '' && result.currentStepKey === "DONE") {
+          setActiveStep(2);
+
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: '권한 부여 되었습니다.',
+            backgroundColor: "#1565c0",
+          });
+
+        } else {
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || ''
+          });
+        }
+    } catch(e) {
+        console.error(e);
+    }
+  }
+
+  const handleFirewall= async () => {
+    const token = localStorage.getItem('login-token');
+    const id = location.state.id || 1;
+    
+    try {
+        const result = await callAuthApi( `http://127.0.0.1:8080/api/requests/${id}/next`, "PATCH", {}, token );
+        
+        /* 권한처리 스탭으로 이동 */
+        if ((result.currentStepKey || '' ) !== '' && result.currentStepKey === "DONE") {
+          setActiveStep(3);
+
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: '방화벽 설정 완료 되었습니다.',
+            backgroundColor: "#1565c0",
+          });
+        } else {
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || ''
+          });
+        }
+    } catch(e) {
+        console.error(e);
+    }
+  }
+
+  const handleFirewallProgress = async () => {
+    const token = localStorage.getItem('login-token');
+    const id = location.state.id || 1;
+    
+    try {
+        const result = await callAuthApi( `http://127.0.0.1:8080/api/requests/${id}/next`, "PATCH", {}, token );
+        
+        /* 권한처리 스탭으로 이동 */
+        if ((result.currentStepKey || '' ) !== '' && result.currentStepKey === "SETTING") {
+          setActiveStep(2);
+
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: '정책 검토가 완료 되었습니다.',
+            backgroundColor: "#1565c0",
+          });
+        } else {
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || ''
+          });
+        }
+        ((result || {currentStepKey: ''}).currentStepKey || '')  !== '' && goFirewallStep(result.steps[2].assignee);
+    } catch(e) {
+        console.error(e);
+    }
+  }
+ 
+
+  /* 승인처리 스탭 */
+  const handleApprove = async () => {
+    const token = localStorage.getItem('login-token');
+    const id = location.state.id || 1;
+    
+    try {
+        const result = await callAuthApi( `http://127.0.0.1:8080/api/requests/${id}/next`, "PATCH", {}, token );
+        
+        /* 권한처리 스탭으로 이동 */
+        if ((result.currentStepKey || '' ) !== '' && result.currentStepKey === "IN_PROGRESS") {
+          setActiveStep(1);
+
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: '승인 처리 되었습니다.',
+            backgroundColor: "#1565c0",
+          });
+
+        } else {
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || ''
+          });
+        }
+
+        ((result || {currentStepKey: ''}).currentStepKey || '')  !== '' && goProgressStep(result.steps[1].assignee);
+    } catch(e) {
+        console.error(e);
+    }
   };
+
+  const handleFirewallApprov = async () => {
+    const token = localStorage.getItem('login-token');
+    const id = location.state.id || 1;
+    
+    try {
+        const result = await callAuthApi( `http://127.0.0.1:8080/api/requests/${id}/next`, "PATCH", {}, token );
+        
+        /* 정책 검토 스탭으로 이동 */
+        if ((result.currentStepKey || '' ) !== '' && result.currentStepKey === "CHECKING_POLICY") {
+          setActiveStep(1);
+
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: '승인 처리 되었습니다.',
+            backgroundColor: "#1565c0",
+          });
+        } else {
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || ''
+          });
+        }
+        ((result || {currentStepKey: ''}).currentStepKey || '')  !== '' && goFirewallReviewerStep(result.steps[1].assignee);
+    } catch(e) {
+        console.error(e);
+    }
+  }
 
   const handleNavMenu = (event) => {
     if (event.target.innerText.includes('HOME')) {
@@ -150,7 +324,7 @@ export default function WorkRequestForm() {
     setTitle(callbackTitle);
   };
 
-  // 승인 담당자 콜백
+  // 권한요청 승인 담당자 콜백
   const callbackUser = (callbackUser) => {
     const splitedUser = (callbackUser || "").split(",");
     setSelectedUser(splitedUser[0]);
@@ -171,6 +345,28 @@ export default function WorkRequestForm() {
     setSelectedGiveUserName(splitedGiveUser[1]);
   };
 
+  // 방화벽설정 - 승인담당자 콜백
+  const callbackApprovUser = callbackApprovUser => {
+    const splitedApproval = (callbackApprovUser || "").split(",");
+    setSelectedApproval(splitedApproval[0]);
+    setSelectedApprovalName(splitedApproval[1]);
+  }
+
+  // 방화벽설정 - 처리담당자 콜백
+  const callbackReviewer = callbackReviewer => {
+    const splitedReviewer = (callbackReviewer || "").split(",");
+    setSelectedReviewer(splitedReviewer[0]);
+    setSelectedReviewerName(splitedReviewer[1]);
+  }
+
+  // 방화벽설정 - 방화벽담당자 콜백
+  const callbackFirewall = callbackFirewall => {
+    const splitedFirewall = (callbackFirewall || "").split(",");
+    setSelectedFirewall(splitedFirewall[0]);
+    setSelectedFirewallName(splitedFirewall[1]);
+  }
+
+  // 요청내용 상세 콜백
   const callbackDetails = (callbackDetails) => {
     console.log("callbackDetails", callbackDetails);
     setSelectedDetails(callbackDetails);
@@ -182,24 +378,71 @@ export default function WorkRequestForm() {
     setSelectedWantDate(callbackWantDate);
   };
 
+  // 출발지IP 콜백
+  const callbackDestination = callbackDestination => {
+    console.log("callbackDestination", callbackDestination);
+    setSelectedDestination(callbackDestination);
+  }
+
+  // 도착지 IP 콜백
+  const callbackSource = callbackSource => {
+    console.log("callbackSource", callbackSource);
+    setSelectedSource(callbackSource);
+  }
+
   useEffect(() => {
-    console.log("요청하기 페이지 load...");
+    // 현재 단계 표시
+    if ( Object.keys(location.state || {}).length > 0 ) {
+      const templateType = location.state.totList.templateId;
+
+      if (templateType.includes('permission')) {
+          const currentStep = location.state.currentStepKey || 'APPROVAL_REQUESTED';
+          const resultStep = currentStep  === "APPROVAL_REQUESTED" ? 0 : currentStep === "IN_PROGRESS" ? 1 : 2
+          setActiveStep(resultStep);
+          setSelectedTemplate('1')
+      } else {
+        const currentStep = location.state.currentStepKey || 'APPROVAL_REQUESTED';
+        const resultStep = currentStep  === "APPROVAL_REQUESTED" ? 0 : currentStep === "CHECKING_POLICY" ? 1 : 
+        currentStep  === "SETTING"  ? 2 : 3;
+
+        setActiveStep(resultStep);
+        setSelectedTemplate('2')
+      }
+    }
   }, []);
 
   const doSubmit = async () => {
-    const param = {
-      templateId: selectedTemplateId,
-      title: title,
-      assignees: [
-        `${selectedUser},${selectedUserName}`,
-        `${selectedManager},${selectedManagerName}`,
-      ],
-      data: {
-        targetUsername: `${selectedGiveUser},${selectedGiveUserName}`,
-        details: selectedDetails,
-        date: selectedWantDate,
-      },
-    };
+    let param = {};
+
+    if (Number(selectedTemplate) === 1 ) {
+      param = {
+        templateId: selectedTemplateId,
+        title: title,
+        assignees: [
+          `${selectedUser},${selectedUserName}`,
+          `${selectedManager},${selectedManagerName}`,
+        ],
+        data: {
+          targetUsername: `${selectedGiveUser},${selectedGiveUserName}`,
+          details: selectedDetails,
+          date: selectedWantDate,
+        },
+      }
+    } else {
+      param = {
+        templateId: selectedTemplateId,
+        title: title,
+        assignees: [
+          `${selectedApprovalName}`,
+          `${selectedReviewerName}`,
+          `${selectedFirewallName}`,
+        ],
+        data : {
+          destination : selectedDestination
+          , source: selectedSource
+        }
+      }
+    } 
 
     const token = localStorage.getItem("login-token");
     try {
@@ -212,11 +455,11 @@ export default function WorkRequestForm() {
 
       // 결과값이 존재하지 않을 경우
       if (result && (result.id || "") === "") {
-        setAlertFlag({
-          ...AlertFlag,
-          showError: !AlertFlag.showError,
-          message: result.message || "통신 중 오류가 발생하였습니다.",
-        });
+          setAlertFlag({
+            ...AlertFlag,
+            showError: !AlertFlag.showError,
+            message: result.message || "통신 중 오류가 발생하였습니다.",
+          });
 
         // 로그인이 필요할 경우 로그인페이지로 이동
         setTimeout(() => {
@@ -256,6 +499,76 @@ export default function WorkRequestForm() {
       console.error(e);
     }
   };
+
+  const handleFirewallSubmit = async () => {
+      if (
+        Number(selectedTemplate || "0") === 0 ||
+        Number(selectedTemplate || "99") === 99
+      ) {
+        setAlertFlag({
+          ...AlertFlag,
+          showError: !AlertFlag.showError,
+          message: "요청양식은 필수 입니다",
+        });
+
+        !!workRequestFormRef.selectedTemplateRef.current &&
+          workRequestFormRef.selectedTemplateRef.current.focus();
+        return;
+      }
+
+
+      if ((title || "") === "") {
+        setAlertFlag({
+          ...AlertFlag,
+          showError: !AlertFlag.showError,
+          message: "제목은 필수 입니다",
+        });
+  
+        !!workRequestFormRef.titleRef.current &&
+          workRequestFormRef.titleRef.current.focus();
+        return;
+      }
+
+      if ((selectedApproval || "99") === "99") {
+        setAlertFlag({
+          ...AlertFlag,
+          showError: !AlertFlag.showError,
+          message: "승인 담당자는 필수 입니다",
+        });
+  
+        !!workRequestFormRef.approval.current &&
+          workRequestFormRef.approval.current.focus();
+        return;
+      }
+
+      if ((selectedReviewer || "99") === "99") {
+        setAlertFlag({
+          ...AlertFlag,
+          showError: !AlertFlag.showError,
+          message: "정책 검토 담당자는 필수 입니다",
+        });
+  
+        !!workRequestFormRef.reviewerRef.current &&
+          workRequestFormRef.reviewerRef.current.focus();
+        return;
+      }
+
+      
+      if ((selectedFirewall || "99") === "99") {
+        setAlertFlag({
+          ...AlertFlag,
+          showError: !AlertFlag.showError,
+          message: "방화벽 설정 담당자는 필수 입니다",
+        });
+  
+        !!workRequestFormRef.firewallRef.current &&
+          workRequestFormRef.firewallRef.current.focus();
+        return;
+      }
+
+      await doSubmit();
+
+  }
 
   const handleSubmit = async () => {
     /* 요청양식 필수값 체크 */
@@ -338,31 +651,162 @@ export default function WorkRequestForm() {
     //setActiveStep(activeStep + 1);
   };
 
-  const findMyStep = () => {
-    let approvComponent =  (
-      Object.keys(location.state || {}).length > 0 && 
+  /* 로그인한 유저가 승인/권한 처리 담당자인지 체크 */
+  const goApprovStep = () => {
+    let result;
+    const approvButton = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Tooltip title="승인하기">
+          <Button  variant="contained" color="success" size="large" onClick={handleApprove} >
+            승인하기
+          </Button>
+        </Tooltip>
+      </Box>
+    );
+      
+    let assignee = undefined;
+
+    if (Object.keys(location.state || {}).length > 0 ) {
+        const splitedAssignee = (location.state.totList.steps[0].assignee || '').split(",");
+        assignee = splitedAssignee[1];
+    }
+
+    if (Object.keys(location.state || {}).length > 0 &&  assignee === localStorage.getItem('login-user'))  {
+        result = approvButton;
+    }
+
+    if (Object.keys(location.state || {}).length <= 0 || location.state.currentStepKey !== 'APPROVAL_REQUESTED'){
+        result = <></>;
+    }
+
+     return result;
+  }
+
+   /* 권한처리 스탭일 */
+   const goProgressStep = (currentStepAssignee)  => {
+    let result;
+    const loginUser = localStorage.getItem('login-user');
+
+    const approvButton = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Tooltip title="권한 부여">
+          <Button  variant="contained" color="success" size="large" onClick={handleProgress} >
+            권한 부여
+          </Button>
+        </Tooltip>
+      </Box>
+    );
+    
+
+    if ((currentStepAssignee || '' ) !== '' && currentStepAssignee === loginUser ) {
+        result = approvButton;
+    } else if (Object.keys(location.state || {}).length > 0){
+        const splitedAssignee = (location.state.totList.steps[1]['assignee'] || '').split(",")
+        
+        result = splitedAssignee[1] === loginUser ? approvButton : <></>
+    }
+
+    if (Object.keys(location.state || {}).length <= 0 || location.state.currentStepKey !== 'IN_PROGRESS' || activeStep === 2){
+      result = <></>;
+    }
+
+    return result;
+  }
+
+  /* 방화벽 승인 담당자 일치여부 */
+  const goFirewallApprovStep = ()  => {
+    let result;
+
+    const approvButton = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Tooltip title="승인처리">
+          <Button  variant="contained" color="success" size="large" onClick={handleFirewallApprov} >
+            승인처리
+          </Button>
+        </Tooltip>
+      </Box>
+    );
+
+    let assignee = undefined;
+
+    if (Object.keys(location.state || {}).length > 0 ) {
+        const splitedAssignee = (location.state.totList.steps[0].assignee || '').split(",");
+        assignee = splitedAssignee[1];
+    }
+
+    if (Object.keys(location.state || {}).length > 0 &&  assignee === localStorage.getItem('login-user'))  {
+        result = approvButton;
+    }
+
+    if (Object.keys(location.state || {}).length <= 0 || location.state.currentStepKey !== 'APPROVAL_REQUESTED'){
+        result = <></>;
+    }
+
+     return result;
+  }
+
+  /* 방화벽 정책 검토 담당자 일치여부 */
+  const goFirewallReviewerStep = (currentStepAssignee)  => {
+    let result;
+    const loginUser = localStorage.getItem('login-user');
+
+    const approvButton = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Tooltip title="정책 검토">
+          <Button  variant="contained" color="success" size="large" onClick={handleFirewallProgress} >
+            정책 검토
+          </Button>
+        </Tooltip>
+      </Box>
+    );
+
+    if ((currentStepAssignee || '' ) !== '' && currentStepAssignee === loginUser ) {
+        result = approvButton;
+    } else if (Object.keys(location.state || {}).length > 0){
+        const splitedAssignee = (location.state.totList.steps[1]['assignee'] || '').split(",")
+        
+        result = splitedAssignee[1] === loginUser ? approvButton : <></>
+    }
+
+    if (Object.keys(location.state || {}).length <= 0 || location.state.currentStepKey !== 'CHECKING_POLICY' || activeStep === 2){
+      result = <></>;
+    }
+    
+    return result;
+  }
+
+    /* 방화벽 설정 담당자 */
+    const goFirewallStep = (currentStepAssignee)  => {
+      let result;
+      const loginUser = localStorage.getItem('login-user');
+  
+      const approvButton = (
         <Box sx={{ flexGrow: 0 }}>
-          <Tooltip title="승인하기">
-            <Button  variant="contained" color="success" size="large" onClick={handleApprove} >
-              승인하기
+          <Tooltip title="방화벽 설정">
+            <Button  variant="contained" color="success" size="large" onClick={handleFirewall} >
+              방화벽 설정
             </Button>
           </Tooltip>
         </Box>
-    )
-
-    return approvComponent;
-  }
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
-  const matchLocationData = () => {
-    const myLocation = JSON.parse(JSON.stringify(location));
-  };
+      );
+  
+      if ((currentStepAssignee || '' ) !== '' && currentStepAssignee === loginUser ) {
+          result = approvButton;
+      } else if (Object.keys(location.state || {}).length > 0){
+          const splitedAssignee = (location.state.totList.steps[2]['assignee'] || '').split(",")
+          
+          result = splitedAssignee[1] === loginUser ? approvButton : <></>
+      }
+  
+      if (Object.keys(location.state || {}).length <= 0 || location.state.currentStepKey !== 'SETTING' || activeStep !== 2){
+        result = <></>;
+      }
+      
+      return result;
+    }
 
   return (
     <ThemeProvider theme={theme}>
-      {matchLocationData()}
       <CssBaseline />
       <AppBar position="static"  style={{ background: "#FFB400", width:"1070px" }}>
         <Container maxWidth="xl">
@@ -432,7 +876,10 @@ export default function WorkRequestForm() {
               ))}
             </Box>
             {
-              findMyStep()    
+              (( Number(selectedTemplate || '99') === 1 || Number(selectedTemplate || '99') === 99 ) && activeStep === 0) ?  goApprovStep() :  goProgressStep()
+            }
+            {
+              (Number(selectedTemplate || '99') === 2  &&activeStep === 0) ? goFirewallApprovStep() : activeStep === 1 ? goFirewallReviewerStep() : goFirewallStep()
             }
           </Toolbar>
         </Container>
@@ -466,6 +913,7 @@ export default function WorkRequestForm() {
               inputRef={workRequestFormRef.titleRef}
               callback={callbackTitle}
               isLocationed={location}
+              placeText={'제목을 입력하세요'}
             />
             <br></br>
             <Typography variant="h5" color="inherit" noWrap>
@@ -506,34 +954,28 @@ export default function WorkRequestForm() {
                 {firewallSteps.map((label, index) => (
                   <Step key={label}>
                     <StepLabel>{label}</StepLabel>
-                    {index !== firewallSteps.length - 1 && (
-                      <CustomDropdownList
-                        size={150}
-                        TemplateList={[]}
-                        placeText={"처리담당자 선택"}
-                        mSize={0}
-                        callback={callbackManager}
-                        dropdownRef={workRequestFormRef.managerRef}
-                      />
-                    )}
+                    <br></br>
+                    {index !== firewallSteps.length - 1&& (
+                        <CustomDropdownList
+                          size={220}
+                          TemplateList={userList}
+                          placeText={index=== 0 ? '승인담당자 선택' : index === 1 ? "정책검토 담당자 선택" : index === 2 ? '방화벽 설정 담당자 선택': ''}
+                          mSize={0}
+                          callback={ index === 0 ? callbackApprovUser : index === 1 ? callbackReviewer : index === 2 ? callbackFirewall : callbackApprovUser }
+                          dropdownRef={index === 0 ? workRequestFormRef.approvalRef : index === 1 ? workRequestFormRef.reviewerRef : index === 2 ? workRequestFormRef.firewallRef : workRequestFormRef.approvalRef}
+                          flag={index === 0 ? "approve" : index === 1 ? "reviewer" : index === 2 ? "firewall" : "approve" }
+                          isLocationed={location.state}
+                          reqType={"firewall"}
+                        />
+                      )
+                    }
                   </Step>
                 ))}
               </Stepper>
             )}
-            {/* 마지막 단계 */}
-            {activeStep === permissionSteps.length ? (
               <>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order.
-                </Typography>
-                <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order
-                  confirmation, and will send you an update when your order has
-                  shipped.
-                </Typography>
-              </>
-            ) : (
-              <>
+              {
+                Number(selectedTemplate || '99') === 1 || Number(selectedTemplate || '99') === 99 ? 
                 <AddressForm
                   userInfo={{
                     userList,
@@ -545,31 +987,34 @@ export default function WorkRequestForm() {
                   }}
                   callbackWantDate={callbackWantDate}
                   wantDateRef={workRequestFormRef.wantDateRef}
-                  isLocationed={JSON.parse(
-                    JSON.stringify(location.state || {})
-                  )}
+                  isLocationed={JSON.parse( JSON.stringify(location.state || {}) )}
                 />
+                :
+                <FirewallForm
+                  destinationInfo={{
+                      callback: callbackDestination,
+                      destinationRef : workRequestFormRef.destinationRef
+                  }}
+                  sourceInfo={{
+                    callback: callbackSource
+                    , sourceRef : workRequestFormRef.sourceRef
+                  }}
+                  isLocationed={ JSON.parse(JSON.stringify(location.state || {}) )}
+                />
+                }
                 {/* {getStepContent(activeStep)} */}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                  {activeStep !== 0 && (
-                    <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
-                      Back
-                    </Button>
-                  )}
                   {Object.keys(location.state || {}).length <= 0 && (
                     <Button
                       variant="contained"
-                      onClick={handleSubmit}
-                      sx={{ mt: 3, ml: 1 }}
-                    >
-                      {activeStep === permissionSteps.length - 1
-                        ? "Place order"
-                        : "요청서 제출"}
+                      onClick={Number(selectedTemplate || '1') === 1 ? handleSubmit : handleFirewallSubmit}
+                      size={'large'}
+                      
+                    > 요청서 제출
                     </Button>
                   )}
                 </Box>
               </>
-            )}
           </Paper>
         </Grid>
       </Container>

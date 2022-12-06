@@ -75,7 +75,10 @@ export default function Login() {
       } else {
         const username = result.username || "";
         const token = result.token || "";
+        
         localStorage.setItem("login-token", token);
+        localStorage.setItem("login-user", username);
+
         axios.defaults.headers.common["Authorization"] = username + " " + token;
 
         history("/workRequest");
@@ -88,8 +91,6 @@ export default function Login() {
 
   useEffect(() => {
     console.log("LoginPage render ...");
-    localStorage.setItem("token", "");
-    // userNameRef.current && userNameRef.current.focus();
   }, []);
 
   const onUserNameHandler = (e) => {

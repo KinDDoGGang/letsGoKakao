@@ -45,6 +45,7 @@
 - Content Type: `application/json`
 - 응답 본문 타입: `TemplateSummary[]`
 
+<필요X>
 # 요청 양식 상세 조회 API
 단건 요청 양식 상세 정보를 조회합니다.
 - `GET /api/templates/:template_id`
@@ -65,6 +66,7 @@
   - `pageSize`: 페이지 크기
 - 응답 본문 타입: `RequestListResponse`
 
+<필요X>
 # 요청서 상세 조회 API
 단건 요청서 상세 정보를 조회합니다.
 - `GET /api/requests/:request_id`
