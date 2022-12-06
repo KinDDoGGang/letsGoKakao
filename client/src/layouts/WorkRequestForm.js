@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext, useNavigate, useLocation } from "react-router-dom";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
@@ -66,6 +66,7 @@ const theme = createTheme();
 
 export default function WorkRequestForm() {
   const history = useNavigate();
+  const location = useLocation();
 
   // 요청양식에서 사용하는 ref....
   const workRequestFormRef = {
@@ -91,6 +92,7 @@ export default function WorkRequestForm() {
   const [selectedManagerName, setSelectedManagerName] = useState("");
   // 부여 대상자
   const [selectedGiveUser, setSelectedGiveUser] = useState("99");
+  const [selectedGiveUserName, setSelectedGiveUserName] = useState("");
   // 요청 내용 상세
   const [selectedDetails, setSelectedDetails] = useState("");
   // 처리 희망일
@@ -146,6 +148,7 @@ export default function WorkRequestForm() {
   const callbackGiveUser = (callbackGiveUser) => {
     const splitedGiveUser = (callbackGiveUser || "").split(",");
     setSelectedGiveUser(splitedGiveUser[0]);
+    setSelectedGiveUserName(splitedGiveUser[1]);
   };
 
   const callbackDetails = (callbackDetails) => {
@@ -167,7 +170,7 @@ export default function WorkRequestForm() {
     const param = {
       templateId: selectedTemplateId,
       title: title,
-      assignees: [selectedUserName, selectedManagerName],
+      assignees: [selectedUser, selectedManager],
       data: {
         targetUsername: selectedGiveUser,
         details: selectedDetails,
@@ -194,10 +197,8 @@ export default function WorkRequestForm() {
 
         // 로그인이 필요할 경우 로그인페이지로 이동
         setTimeout(() => {
-          result.message.includes('로그인') && history("/");  
+          result.message.includes("로그인") && history("/");
         }, 1000);
-        
-
       } else {
         let params = undefined;
         const columns = makeWorkRequestListColumn();
@@ -317,9 +318,13 @@ export default function WorkRequestForm() {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+  const matchLocationData = () => {
+    const myLocation = JSON.parse(JSON.stringify(location));
+  };
 
   return (
     <ThemeProvider theme={theme}>
+      {matchLocationData()}
       <CssBaseline />
       <AppBar
         position="absolute"
@@ -353,6 +358,7 @@ export default function WorkRequestForm() {
               mSize={1}
               callback={callbackTemplate}
               dropdownRef={workRequestFormRef.selectedTemplateRef}
+              isLocationed={location}
             />
             <br></br>
             <Typography variant="h5" color="inherit" noWrap>
@@ -362,6 +368,7 @@ export default function WorkRequestForm() {
               fullWidth
               inputRef={workRequestFormRef.titleRef}
               callback={callbackTitle}
+              isLocationed={location}
             />
             <br></br>
             <Typography variant="h5" color="inherit" noWrap>
@@ -389,7 +396,7 @@ export default function WorkRequestForm() {
                             ? workRequestFormRef.userRef
                             : workRequestFormRef.managerRef
                         }
-                        isDisabled={false}
+                        isLocationed={location}
                         //isDisabled={index === 0 ? false: true}
                       />
                     )}
@@ -440,6 +447,9 @@ export default function WorkRequestForm() {
                   }}
                   callbackWantDate={callbackWantDate}
                   wantDateRef={workRequestFormRef.wantDateRef}
+                  isLocationed={JSON.parse(
+                    JSON.stringify(location.state || {})
+                  )}
                 />
                 {/* {getStepContent(activeStep)} */}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

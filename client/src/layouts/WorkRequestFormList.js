@@ -11,7 +11,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 
-import { useOutletContext, useLocation } from "react-router-dom";
+import { useOutletContext, useLocation, useNavigate } from "react-router-dom";
 import { makeDate } from "../utils/utils";
 
 const theme = createTheme();
@@ -19,6 +19,7 @@ const theme = createTheme();
 export default function WorkRequestFormList() {
   const { workRequestList } = useOutletContext();
   const location = useLocation();
+  const history = useNavigate();
 
   useEffect(() => {
     console.log("workRequestList >> ", workRequestList);
@@ -30,6 +31,11 @@ export default function WorkRequestFormList() {
     console.log("GridCellParams", GridCellParams);
     console.log("event", e);
     console.log("callback cellClick", callback);
+
+    history("/workRequest/workRequestForm", {
+      state: GridCellParams["row"],
+      isDisabled: true,
+    });
   };
 
   // 깊은복사 [workRequestList 객체는 redux 객체여서 변경 불가]
