@@ -29,7 +29,7 @@ export default function CustomDropdownList({
         case "template":
           return (result = locationedMap["templateId"].includes("permission")
             ? `1,${locationedMap["templateId"]}`
-            : `2${locationedMap["templateId"]}`);
+            : `2,${locationedMap["templateId"]}`);
 
         case "assignee":
           return (result = locationedMap["steps"][0]["assignee"]);

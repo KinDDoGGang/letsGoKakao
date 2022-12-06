@@ -339,16 +339,18 @@ export default function WorkRequestForm() {
   };
 
   const findMyStep = () => {
-    return (
+    let approvComponent =  (
       Object.keys(location.state || {}).length > 0 && 
         <Box sx={{ flexGrow: 0 }}>
           <Tooltip title="승인하기">
-            <Button  variant="contained" size="large" onClick={handleApprove} sx={{ p: 0 }}>
+            <Button  variant="contained" color="success" size="large" onClick={handleApprove} >
               승인하기
             </Button>
           </Tooltip>
         </Box>
     )
+
+    return approvComponent;
   }
 
   const handleBack = () => {
