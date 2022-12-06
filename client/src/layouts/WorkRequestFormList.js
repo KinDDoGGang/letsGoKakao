@@ -12,7 +12,7 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 
 import { useOutletContext, useLocation, useNavigate } from "react-router-dom";
-import { makeDate } from "../utils/utils";
+import { callAuthApi } from "../utils/utils";
 
 const theme = createTheme();
 
@@ -26,14 +26,44 @@ export default function WorkRequestFormList() {
     console.log("location data", location);
   }, []);
 
+  const selectUserList =  () => {
+    const token = localStorage.getItem("login-token") || "";
+    const result =  callAuthApi(
+      "http://127.0.0.1:8080/api/usernames",
+      "GET",
+      {},
+      token
+    );
+    return result;
+  };
+
+
   /* TODO 여기 cell 클릭 했을 때, data 뿌려주면서 상세화면으로 이동필요, 상세화면일 경우에는 승인 버튼도 존재할 수 있음 */
-  const onCellClick = (GridCellParams, e, callback) => {
+  const onCellClick = async (GridCellParams, e, callback) => {
     console.log("GridCellParams", GridCellParams);
-    console.log("event", e);
-    console.log("callback cellClick", callback);
+
+    const userList = await selectUserList();
+    const copiedGridCellParams = JSON.parse(JSON.stringify(GridCellParams));
+    const regex = /[^0-9]/g;
+    
+    const targetUsername = (copiedGridCellParams["row"]['totList']['data']['targetUsername'] || '' );
+    const assignee = copiedGridCellParams["row"]['totList']['steps'][0]['assignee'];
+    const operator = copiedGridCellParams["row"]['totList']['steps'][1]['assignee'];
+
+    const targetUsernameIndex = userList.indexOf(targetUsername);
+    const assigneeIndex = userList.indexOf(assignee);
+    const operatorIndex = userList.indexOf(operator);
+
+    if ( targetUsername.replace(regex, "") === '' ) {
+        copiedGridCellParams["row"]['totList']['data']['targetUsername'] = `${targetUsernameIndex+1},${targetUsername}`;
+        copiedGridCellParams["row"]['totList']['steps'][0]['assignee'] = `${assigneeIndex+1},${assignee}`;
+        copiedGridCellParams["row"]['totList']['steps'][1]['assignee'] = `${operatorIndex+1},${operator}`;
+    }
+
+    console.log('copiedGridCell', copiedGridCellParams);
 
     history("/workRequest/workRequestForm", {
-      state: GridCellParams["row"],
+      state: copiedGridCellParams["row"],
       isDisabled: true,
     });
   };

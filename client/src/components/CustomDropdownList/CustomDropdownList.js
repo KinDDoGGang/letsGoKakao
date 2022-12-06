@@ -29,18 +29,21 @@ export default function CustomDropdownList({
         case "template":
           return (result = locationedMap["templateId"].includes("permission")
             ? `1,${locationedMap["templateId"]}`
-            : `2${locationedMap["templateId"]}`);
+            : `2,${locationedMap["templateId"]}`);
 
         case "assignee":
           return (result = locationedMap["steps"][0]["assignee"]);
 
         case "operator":
           return (result = locationedMap["steps"][1]["assignee"]);
+
+        default : 
+          return '99';
       }
     }
   };
 
-  const [template, setTemplate] = useState("99");
+  const [template, setTemplate] = useState("");
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleChange = (event) => {
@@ -64,14 +67,14 @@ export default function CustomDropdownList({
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">{placeText}</InputLabel>
         <Select
-          inputRef={dropdownRef}
-          value={getTemplateData() || template}
-          label="select"
-          onChange={handleChange}
-          sx={{
-            "& > :not(style)": { m: mSize },
-          }}
-          disabled={!!flag && Object.keys(isLocationed || {}).length > 0}
+            inputRef={dropdownRef}
+            value={getTemplateData() || template}
+            label="select"
+            onChange={handleChange}
+            sx={{
+              "& > :not(style)": { m: mSize },
+            }}
+            disabled={!!flag && Object.keys(isLocationed || {}).length > 0}
         >
           {/* 현재 양식요청 Object, 사용자명 조회하는 string 타입으로 나뉘어짐 */}
           {(TemplateList || []).length > 0 && typeof TemplateList[0] == "object"
