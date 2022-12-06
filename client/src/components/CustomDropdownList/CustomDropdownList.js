@@ -15,36 +15,65 @@ export default function CustomDropdownList({
   dropdownRef,
   flag,
   isLocationed,
+  reqType
 }) {
   const getTemplateData = () => {
-    let result;
     if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
       const locationedMap = isLocationed["totList"];
 
       switch (flag) {
         // 부여대상일 경우
         case "giveUser":
-          return (result = locationedMap["data"]["targetUsername"]);
+          return (locationedMap["data"]["targetUsername"]);
 
         case "template":
-          return (result = locationedMap["templateId"].includes("permission")
+          return (locationedMap["templateId"].includes("permission")
             ? `1,${locationedMap["templateId"]}`
             : `2,${locationedMap["templateId"]}`);
 
         case "assignee":
-          return (result = locationedMap["steps"][0]["assignee"]);
+          return (locationedMap["steps"][0]["assignee"]);
 
         case "operator":
-          return (result = locationedMap["steps"][1]["assignee"]);
+          return (locationedMap["steps"][1]["assignee"]);
 
         default : 
-          return '99';
+          return '';
       }
     }
   };
 
+  const getFirewallData = () => {
+
+    if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
+      console.log('fireWall in locationed data', isLocationed);
+
+      const locationedMap = isLocationed["totList"];
+      
+      switch (flag) {
+        // 템플릿일 경우
+        case "template":
+          return (locationedMap["templateId"].includes("permission")
+            ? `1,${locationedMap["templateId"]}`
+            : `2,${locationedMap["templateId"]}`);
+
+        case "approve":
+          return (locationedMap["steps"][0]["assignee"]);
+
+        case "reviewer":
+          return (locationedMap["steps"][1]["assignee"]);
+
+        case "firewall":
+          return (locationedMap["steps"][2]["assignee"]);
+
+        default : 
+          return '';
+      }
+
+    }
+  }
+
   const [template, setTemplate] = useState("");
-  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleChange = (event) => {
     setTemplate(event.target.value);
@@ -68,7 +97,7 @@ export default function CustomDropdownList({
         <InputLabel id="demo-simple-select-label">{placeText}</InputLabel>
         <Select
             inputRef={dropdownRef}
-            value={getTemplateData() || template}
+            value={reqType !== "firewall" ?  (getTemplateData() || template) : getFirewallData() || template}
             label="select"
             onChange={handleChange}
             sx={{

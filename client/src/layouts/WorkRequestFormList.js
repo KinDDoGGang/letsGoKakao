@@ -37,12 +37,26 @@ export default function WorkRequestFormList() {
     return result;
   };
 
+  const selectRequestForm = id => {
+    const token = localStorage.getItem("login-token") || "";
+    const result =  callAuthApi(
+      `http://127.0.0.1:8080/api/requests/${id}`,
+      "GET",
+      {},
+      token
+    );
+    return result;
+  }
+
 
   /* TODO 여기 cell 클릭 했을 때, data 뿌려주면서 상세화면으로 이동필요, 상세화면일 경우에는 승인 버튼도 존재할 수 있음 */
   const onCellClick = async (GridCellParams, e, callback) => {
     console.log("GridCellParams", GridCellParams);
 
+    /* TODO 1초에 지연시간이 있어서 로딩바 같은게 필요해보임 */
     const userList = await selectUserList();
+    const currentRequestForm = await selectRequestForm(GridCellParams.row.id);
+
     const copiedGridCellParams = JSON.parse(JSON.stringify(GridCellParams));
     const regex = /[^0-9]/g;
     
@@ -53,18 +67,28 @@ export default function WorkRequestFormList() {
     const targetUsernameIndex = userList.indexOf(targetUsername);
     const assigneeIndex = userList.indexOf(assignee);
     const operatorIndex = userList.indexOf(operator);
+    
 
     if ( targetUsername.replace(regex, "") === '' ) {
         copiedGridCellParams["row"]['totList']['data']['targetUsername'] = `${targetUsernameIndex+1},${targetUsername}`;
         copiedGridCellParams["row"]['totList']['steps'][0]['assignee'] = `${assigneeIndex+1},${assignee}`;
         copiedGridCellParams["row"]['totList']['steps'][1]['assignee'] = `${operatorIndex+1},${operator}`;
+
+        // 방화벽 정책 설정일 경우 step4 까지 있음
+        if (copiedGridCellParams["row"]['totList']['steps'].length === 4 ) {
+          const firewall = copiedGridCellParams["row"]['totList']['steps'][2]['assignee'];
+          const firewallIndex = userList.indexOf(firewall);
+          copiedGridCellParams["row"]['totList']['steps'][2]['assignee'] = `${firewallIndex+1},${firewall}`;
+        }
     }
 
     console.log('copiedGridCell', copiedGridCellParams);
 
     history("/workRequest/workRequestForm", {
-      state: copiedGridCellParams["row"],
-      isDisabled: true,
+      state: {
+        ...copiedGridCellParams['row'],
+        currentStepKey : currentRequestForm.currentStepKey
+      }
     });
   };
 

@@ -7,20 +7,30 @@ export default function CustomInput({
   inputRef,
   callback,
   isLocationed,
+  placeText,
+  flag
 }) {
-  const [title, setTitle] = useState("");
-  let locationedTitle = "";
+  const [txt, setTxt] = useState("");
+  let locationedTxt = "";
+  
+
   const handleChange = (event) => {
-    setTitle(event.target.value);
+    setTxt(event.target.value);
     callback(event.target.value);
   };
 
   useEffect(() => {
-    if (Object.keys(isLocationed.state || {}).length > 0) {
-      locationedTitle = isLocationed.state.title;
-      setTitle(locationedTitle);
-      callback(locationedTitle);
-    }
+      console.log('isLocationed in customInput >> ', isLocationed);
+    
+      if (Object.keys(isLocationed.state || {}).length > 0 &&  flag !== 'destination' && flag !== 'source') {
+          locationedTxt = isLocationed.state.title;
+      } else if (Object.keys(isLocationed).length > 0 &&  flag === 'destination') {
+          locationedTxt = isLocationed.totList.data.destination;
+      } else if (Object.keys(isLocationed).length > 0 && flag === 'source') {
+          locationedTxt = isLocationed.totList.data.source;
+      }
+      setTxt(locationedTxt);
+      callback(locationedTxt);
   }, []);
 
   return (
@@ -34,12 +44,12 @@ export default function CustomInput({
     >
       <TextField
         id="outlined-basic"
-        label="제목을 입력하세요"
+        label={placeText}
         variant="outlined"
         inputRef={inputRef}
         onChange={handleChange}
-        value={locationedTitle || title}
-        disabled={Object.keys(isLocationed.state || {}).length > 0}
+        value={locationedTxt || txt}
+        disabled={Object.keys(isLocationed.state || {}).length > 0 ||  ( (flag || '') !== '' && Object.keys(isLocationed).length > 0) }
       />
     </Box>
   );
