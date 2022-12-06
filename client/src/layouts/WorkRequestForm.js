@@ -191,6 +191,13 @@ export default function WorkRequestForm() {
           showError: !AlertFlag.showError,
           message: result.message || "통신 중 오류가 발생하였습니다.",
         });
+
+        // 로그인이 필요할 경우 로그인페이지로 이동
+        setTimeout(() => {
+          result.message.includes('로그인') && history("/");  
+        }, 1000);
+        
+
       } else {
         let params = undefined;
         const columns = makeWorkRequestListColumn();
