@@ -16,28 +16,36 @@ export default function CustomDropdownList({
   flag,
   isLocationed,
 }) {
-  const [template, setTemplate] = useState(getTemplateData());
+  const getTemplateData = () => {
+    let result;
+    if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
+      const locationedMap = isLocationed["totList"];
+
+      switch (flag) {
+        // 부여대상일 경우
+        case "giveUser":
+          return (result = locationedMap["data"]["targetUsername"]);
+
+        case "template":
+          return (result = locationedMap["templateId"].includes("permission")
+            ? `1,${locationedMap["templateId"]}`
+            : `2${locationedMap["templateId"]}`);
+
+        case "assignee":
+          return (result = locationedMap["steps"][0]["assignee"]);
+
+        case "operator":
+          return (result = locationedMap["steps"][1]["assignee"]);
+      }
+    }
+  };
+
+  const [template, setTemplate] = useState("99");
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleChange = (event) => {
     setTemplate(event.target.value);
     callback(event.target.value);
-  };
-
-  const getTemplateData = () => {
-    let result;
-    if (Object.keys(isLocationed).length > 0) {
-      switch (flag) {
-        // 부여대상일 경우
-        case "giveUser":
-          result = isLocationed["totList"]["data"]["targetUserName"];
-          break;
-
-        default:
-          break;
-      }
-    }
-    return result;
   };
 
   // useEffect(() => {
@@ -57,13 +65,13 @@ export default function CustomDropdownList({
         <InputLabel id="demo-simple-select-label">{placeText}</InputLabel>
         <Select
           inputRef={dropdownRef}
-          value={template}
+          value={getTemplateData() || template}
           label="select"
           onChange={handleChange}
           sx={{
             "& > :not(style)": { m: mSize },
           }}
-          // disabled={isDisabled}
+          disabled={!!flag && Object.keys(isLocationed || {}).length > 0}
         >
           {/* 현재 양식요청 Object, 사용자명 조회하는 string 타입으로 나뉘어짐 */}
           {(TemplateList || []).length > 0 && typeof TemplateList[0] == "object"

@@ -16,10 +16,16 @@ import Paper from "@mui/material/Paper";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Menu from "@mui/material/Menu";
+import MenuIcon from "@mui/icons-material/Menu";
+import Avatar from "@mui/material/Avatar";
+import MenuItem from "@mui/material/MenuItem";
+import AdbIcon from "@mui/icons-material/Adb";
 
 import CustomSnackbar from "../components/CustomSnackbar/CustomSnackbar";
 import CustomDropdownList from "../components/CustomDropdownList/CustomDropdownList";
@@ -106,6 +112,28 @@ export default function WorkRequestForm() {
     backgroundColor: "",
   });
 
+  const pages = ["Products", "Pricing", "Blog"];
+  const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
+  /**여기서부터 MUI */
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
   const handleCloseSnackbar = () => {
     /** clearTimeout 어디서할지 찾아봐야함 */
     timeoutSnackbar = setTimeout(() => {
@@ -132,7 +160,7 @@ export default function WorkRequestForm() {
 
   // 승인 담당자 콜백
   const callbackUser = (callbackUser) => {
-    const splitedUser = callbackUser || "";
+    const splitedUser = (callbackUser || "").split(",");
     setSelectedUser(splitedUser[0]);
     setSelectedUserName(splitedUser[1]);
   };
@@ -170,9 +198,12 @@ export default function WorkRequestForm() {
     const param = {
       templateId: selectedTemplateId,
       title: title,
-      assignees: [selectedUser, selectedManager],
+      assignees: [
+        `${selectedUser},${selectedUserName}`,
+        `${selectedManager},${selectedManagerName}`,
+      ],
       data: {
-        targetUsername: selectedGiveUser,
+        targetUsername: `${selectedGiveUser},${selectedGiveUserName}`,
         details: selectedDetails,
         date: selectedWantDate,
       },
@@ -326,20 +357,126 @@ export default function WorkRequestForm() {
     <ThemeProvider theme={theme}>
       {matchLocationData()}
       <CssBaseline />
-      <AppBar
-        position="absolute"
-        color="default"
-        elevation={0}
-        sx={{
-          position: "relative",
-          borderBottom: (t) => `1px solid ${t.palette.divider}`,
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            홈 이미지 / 요청 하기 <CustomLogout />
-          </Typography>
-        </Toolbar>
+      <AppBar position="static">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              LOGO
+            </Typography>
+
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: "block", md: "none" },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">{page}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+            <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                display: { xs: "flex", md: "none" },
+                flexGrow: 1,
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              LOGO
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {pages.map((page) => (
+                <Button
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page}
+                </Button>
+              ))}
+            </Box>
+
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
       </AppBar>
 
       <Container component="main" sx={{ mb: 15 }} style={{ float: "left" }}>
@@ -358,7 +495,8 @@ export default function WorkRequestForm() {
               mSize={1}
               callback={callbackTemplate}
               dropdownRef={workRequestFormRef.selectedTemplateRef}
-              isLocationed={location}
+              flag={"template"}
+              isLocationed={location.state}
             />
             <br></br>
             <Typography variant="h5" color="inherit" noWrap>
@@ -396,7 +534,8 @@ export default function WorkRequestForm() {
                             ? workRequestFormRef.userRef
                             : workRequestFormRef.managerRef
                         }
-                        isLocationed={location}
+                        flag={index === 0 ? "assignee" : "operator"}
+                        isLocationed={location.state}
                         //isDisabled={index === 0 ? false: true}
                       />
                     )}
@@ -458,15 +597,17 @@ export default function WorkRequestForm() {
                       Back
                     </Button>
                   )}
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    sx={{ mt: 3, ml: 1 }}
-                  >
-                    {activeStep === permissionSteps.length - 1
-                      ? "Place order"
-                      : "요청서 제출"}
-                  </Button>
+                  {Object.keys(location.state || {}).length <= 0 && (
+                    <Button
+                      variant="contained"
+                      onClick={handleSubmit}
+                      sx={{ mt: 3, ml: 1 }}
+                    >
+                      {activeStep === permissionSteps.length - 1
+                        ? "Place order"
+                        : "요청서 제출"}
+                    </Button>
+                  )}
                 </Box>
               </>
             )}
