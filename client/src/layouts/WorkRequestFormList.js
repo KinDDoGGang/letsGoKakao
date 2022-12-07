@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useOutletContext, useLocation, useNavigate } from "react-router-dom";
 
 import { DataGrid } from "@mui/x-data-grid";
 import { useDemoData } from "@mui/x-data-grid-generator";
@@ -12,9 +13,12 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 
 import CustomSnackbar from "../components/CustomSnackbar/CustomSnackbar";
+import Header from "../layouts/Header";
 
-import { useOutletContext, useLocation, useNavigate } from "react-router-dom";
-import { callAuthApi } from "../utils/utils";
+import { 
+  callAuthApi,
+  makeWorkRequestListColumn,
+  makeWorkRequestListRows, } from "../utils/utils";
 
 const theme = createTheme();
 
@@ -26,6 +30,12 @@ export default function WorkRequestFormList() {
   useEffect(() => {
     console.log("workRequestList >> ", workRequestList);
     console.log("location data", location);
+    selectRequestForm();
+    
+    // 요청서 작성 후 페이지이동이 아닌 메뉴 클릭 시 이동할 경우
+    // if ( Object.keys(location.state || {}).length <= 0 ) {
+    //selectRequestForm();
+    // }
   }, []);
 
   const handleCloseSnackbar = () => {
@@ -49,7 +59,30 @@ export default function WorkRequestFormList() {
     return result;
   };
 
-  const selectRequestForm = (id) => {
+  
+  const selectRequestForm = async () => {
+    const token = localStorage.getItem("login-token") || "";
+    const result = await callAuthApi("http://127.0.0.1:8080/api/requests","GET",{},token);
+
+    console.log("result workRequestList >>", result);
+
+    const columns = makeWorkRequestListColumn;
+
+    /* 아무것도 없을 때 noRows */
+    if ((result["content"] || []).length > 0) {
+      const rows = makeWorkRequestListRows(result["content"]);
+      console.log("result rows", rows);
+
+      setWorkRequestList({ columns, rows, totList: result });
+    } else {
+      setWorkRequestList({ columns, rows: [], totList: [] });
+    }
+
+    setIsLoading(false);
+  };
+
+
+  const selectRequestFormDetail = (id) => {
     const token = localStorage.getItem("login-token") || "";
     const result = callAuthApi(
       `http://127.0.0.1:8080/api/requests/${id}`,
@@ -60,13 +93,22 @@ export default function WorkRequestFormList() {
     return result;
   };
 
+  
+  const handleNavMenu = (event) => {
+    if (event.target.innerText.includes("HOME")) {
+      // home 버튼으로 이동할건지 컨펌창 노출필요 history("/")
+    } else if (event.target.innerText.includes("목록")) {
+      history("/workRequest/workRequestFormList");
+    }
+  };
+
   /* TODO 여기 cell 클릭 했을 때, data 뿌려주면서 상세화면으로 이동필요, 상세화면일 경우에는 승인 버튼도 존재할 수 있음 */
   const onCellClick = async (GridCellParams, e, callback) => {
     console.log("GridCellParams", GridCellParams);
 
     /* TODO 1초에 지연시간이 있어서 로딩바 같은게 필요해보임 */
     const userList = await selectUserList();
-    const currentRequestForm = await selectRequestForm(GridCellParams.row.id);
+    const currentRequestForm = await selectRequestFormDetail(GridCellParams.row.id);
 
     if ((currentRequestForm || { row: "" }).row === "") {
       setAlertFlag({
@@ -128,14 +170,23 @@ export default function WorkRequestFormList() {
   // 깊은복사 [workRequestList 객체는 redux 객체여서 변경 불가]
   const myWorkRequestList = JSON.parse(JSON.stringify(workRequestList));
 
-  const [pageSize, setPageSize] = React.useState(25);
+  const [pageSize, setPageSize] = React.useState(10);
   const [AlertFlag, setAlertFlag] = useState({
     message: "",
     showError: false,
     backgroundColor: "",
   });
 
+  const [WorkRequestList, setWorkRequestList] = useState({
+    columns: [],
+    rows: [],
+    totList: [],
+  });
+
+  const [isLoading, setIsLoading] = useState(true);
+
   let rowsData = (myWorkRequestList || { rows: [] }).rows;
+  const pages = ["HOME / ", "요청 목록"];
 
   if (Object.keys(location.state || {}).length > 0 && rowsData.length > 0) {
     let locationRow = location.state.rows;
@@ -153,21 +204,19 @@ export default function WorkRequestFormList() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar
-        position="absolute"
-        color="default"
-        elevation={0}
-        sx={{
-          position: "relative",
-          borderBottom: (t) => `1px solid ${t.palette.divider}`,
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            홈 이미지 / 요청 목록
-          </Typography>
-        </Toolbar>
-      </AppBar>
+        <Header 
+          pages={pages}
+          handleNavMenu={handleNavMenu}
+          selectedTemplate={null}
+          activeStep={null}
+          buttonFunctions={{
+            goApprovStep: ''
+            , goProgressStep: ''
+            , goFirewallApprovStep: ''
+            , goFirewallReviewerStep: ''
+            , goFirewallStep: ''
+          }}
+        />
       <Container component="main" sx={{ mb: 15 }} style={{ float: "left" }}>
         <Grid container spacing={3}>
           <Paper
@@ -178,11 +227,13 @@ export default function WorkRequestFormList() {
             <div style={{ width: "100%", height: "100%" }}>
               <DataGrid
                 pageSize={pageSize}
+                rowsPerPageOptions={[10, 20, 30]}
                 onPageSizeChange={(newPage) => setPageSize(newPage)}
                 pagination
-                rows={myWorkRequestList["rows"]}
-                columns={myWorkRequestList["columns"]}
+                rows={WorkRequestList['rows'] || myWorkRequestList["rows"]}
+                columns={makeWorkRequestListColumn || myWorkRequestList["columns"]}
                 onCellClick={onCellClick}
+                loading={isLoading}
               />
             </div>
           </Paper>
