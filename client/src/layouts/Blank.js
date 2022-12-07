@@ -1,5 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function Blank() {
-    return <div>This is Blank page</div>
+    return <div>This is Blank page</div>;
 }
