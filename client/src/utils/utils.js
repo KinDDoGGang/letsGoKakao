@@ -116,16 +116,15 @@ export function makeDate(targetDate) {
   return year + "." + month + "." + date + ". " + hours + "시" + minutes + "분";
 }
 
-export function makeWorkRequestListColumn() {
-  const result = [
+export const makeWorkRequestListColumn = (
+  [
     { field: "id", headerName: "요청ID", flex: 1 },
     { field: "title", headerName: "제목", flex: 1 },
     { field: "requestedBy", headerName: "작성자", flex: 1 },
     { field: "date", headerName: "작성일시", flex: 1 },
-    { field: "totList", headerName: "", flex: 1, hide: true },
-  ];
-  return result;
-}
+    { field: "totList", headerName: "헤더 왜 안사라짐", flex: 1, hide: true },
+  ]
+)
 
 export function makeWorkRequestListRows(workRequestList) {
   return Array.isArray(workRequestList)
@@ -145,4 +144,8 @@ export function makeWorkRequestListRows(workRequestList) {
         date: makeDate(new Date(workRequestList["createdAt"])),
         totList: workRequestList,
       };
+}
+
+export function isFunc (func) {
+  return (typeof func == 'function');
 }

@@ -28,6 +28,7 @@ import CustomInput from "../components/CustomInput/CustomInput";
 
 import AddressForm from "../layouts/AddresForm";
 import FirewallForm from "../layouts/FirewallForm";
+import Header from '../layouts/Header';
 
 import {
   callAuthApi,
@@ -159,6 +160,11 @@ export default function WorkRequestForm() {
           message: "권한 부여 되었습니다.",
           backgroundColor: "#1565c0",
         });
+
+        setTimeout(() => {
+          history('/workRequest/workRequestFormList')
+        }, 1000);
+
       } else {
         setAlertFlag({
           ...AlertFlag,
@@ -196,6 +202,11 @@ export default function WorkRequestForm() {
           message: "방화벽 설정 완료 되었습니다.",
           backgroundColor: "#1565c0",
         });
+
+        setTimeout(() => {
+          history('/workRequest/workRequestFormList')
+        }, 1000);
+
       } else {
         setAlertFlag({
           ...AlertFlag,
@@ -233,6 +244,11 @@ export default function WorkRequestForm() {
           message: "정책 검토가 완료 되었습니다.",
           backgroundColor: "#1565c0",
         });
+
+        setTimeout(() => {
+          history('/workRequest/workRequestFormList')
+        }, 1000);
+
       } else {
         setAlertFlag({
           ...AlertFlag,
@@ -273,6 +289,11 @@ export default function WorkRequestForm() {
           message: "승인 처리 되었습니다.",
           backgroundColor: "#1565c0",
         });
+
+        setTimeout(() => {
+          history('/workRequest/workRequestFormList')
+        }, 1000);
+
       } else {
         setAlertFlag({
           ...AlertFlag,
@@ -313,6 +334,11 @@ export default function WorkRequestForm() {
           message: "승인 처리 되었습니다.",
           backgroundColor: "#1565c0",
         });
+
+        setTimeout(() => {
+          history('/workRequest/workRequestFormList')
+        }, 1000);
+
       } else {
         setAlertFlag({
           ...AlertFlag,
@@ -516,7 +542,9 @@ export default function WorkRequestForm() {
         }, 1000);
       } else {
         let params = undefined;
-        const columns = makeWorkRequestListColumn();
+        const columns = makeWorkRequestListColumn;
+
+        console.log('columns 없어?', columns)
 
         setAlertFlag({
           ...AlertFlag,
@@ -537,7 +565,8 @@ export default function WorkRequestForm() {
         }
 
         const historyTime = setTimeout(() => {
-          history("/workRequest/workRequestFormList", { state: params });
+          history("/workRequest/workRequestFormList");
+          // history("/workRequest/workRequestFormList", { state: params });
           clearTimeout(historyTime);
         }, 700);
 
@@ -921,89 +950,20 @@ export default function WorkRequestForm() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar
-        position="static"
-        style={{ background: "#FFB400", width: "1070px" }}
-      >
-        <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              GO LOGIN
-            </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {pages.map((page, index) => (
-                  <MenuItem key={page} onClick={console.log("home button")}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page, index) => (
-                <Button
-                  key={page}
-                  onClick={handleNavMenu.bind(this)}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  {page}
-                </Button>
-              ))}
-            </Box>
-            {(Number(selectedTemplate || "99") === 1 ||
-              Number(selectedTemplate || "99") === 99) &&
-            activeStep === 0
-              ? goApprovStep()
-              : goProgressStep()}
-            {Number(selectedTemplate || "99") === 2 && activeStep === 0
-              ? goFirewallApprovStep()
-              : activeStep === 1
-              ? goFirewallReviewerStep()
-              : goFirewallStep()}
-          </Toolbar>
-        </Container>
-      </AppBar>
-
+      
+      <Header 
+        pages={pages}
+        handleNavMenu={handleNavMenu}
+        selectedTemplate={selectedTemplate}
+        activeStep={activeStep}
+        buttonFunctions={{
+          goApprovStep
+          , goProgressStep
+          , goFirewallApprovStep
+          , goFirewallReviewerStep
+          , goFirewallStep
+        }}
+      />
       <Container component="main" sx={{ mb: 15 }} style={{ float: "left" }}>
         <Grid container spacing={3}>
           <Paper

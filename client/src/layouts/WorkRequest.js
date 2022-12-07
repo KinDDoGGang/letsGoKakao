@@ -9,9 +9,7 @@ import CustomSnackbar from "../components/CustomSnackbar/CustomSnackbar";
 import { useNavigate } from "react-router-dom";
 
 import {
-  callApi,
   callAuthApi,
-  makeDate,
   makeWorkRequestListColumn,
   makeWorkRequestListRows,
 } from "../utils/utils";
@@ -91,7 +89,7 @@ export default function WorkRequest() {
 
     console.log("result workRequestList >>", result);
 
-    const columns = makeWorkRequestListColumn();
+    const columns = makeWorkRequestListColumn;
 
     /* 아무것도 없을 때 noRows */
     if ((result["content"] || []).length > 0) {

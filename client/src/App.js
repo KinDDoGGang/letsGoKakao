@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
-    BrowserRouter as Router, 
     Outlet, 
     Route, 
     Routes, 
-    Link, 
     Navigate, 
     NavLink, 
     useParams
@@ -15,31 +13,9 @@ import './App.css';
 import Login from './layouts/Login';
 import NotFound from './layouts/NotFound';
 import WorkRequest from './layouts/WorkRequest';
-import Start from './layouts/Start';
-import AppLayout from './layouts/AppLayout';
-import Blank from './layouts/Blank';
+
 import WorkRequestForm from './layouts/WorkRequestForm';
 import WorkRequestFormList from './layouts/WorkRequestFormList';
-
-
-import AuthRoute from './layouts/AuthRoute';
-
-import { withStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 
 var contents = [
     {id : 1, title:'HTML', description:'HTML is ...'},
@@ -104,7 +80,6 @@ export default function App(){
                     <Route path="workRequestForm" element={<WorkRequestForm />} />
                     <Route path='workRequestFormList' element={<WorkRequestFormList />} />
                 </Route>
-                <Route path="/start" element={<Start />} />
                 <Route path="*" element={<NotFound />} /> 
             </Routes>
         </div>
