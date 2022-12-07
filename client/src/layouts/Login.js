@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import Logo from "../assets/images/illustrations/pattern-tree.svg";
+import Logo from "../utils/pattern-tree.svg";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { callApi, callAuthApi } from "../utils/utils";
+import { callApi  } from "../utils/utils";
 import CustomSnackbar from "../components/CustomSnackbar/CustomSnackbar";
 
 /* material */
