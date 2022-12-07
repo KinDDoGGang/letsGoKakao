@@ -7,7 +7,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { getToday } from "../utils/utils";
 
-export default function AddressForm({
+export default function PermissionForm({
     userInfo,
     reqDetailInfo,
     callbackWantDate,

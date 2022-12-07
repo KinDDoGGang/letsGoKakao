@@ -20,7 +20,7 @@ import CustomSnackbar from "../components/CustomSnackbar/CustomSnackbar";
 import CustomDropdownList from "../components/CustomDropdownList/CustomDropdownList";
 import CustomInput from "../components/CustomInput/CustomInput";
 
-import AddressForm from "../layouts/AddresForm";
+import PermissionForm from "../layouts/PermissionForm";
 import FirewallForm from "../layouts/FirewallForm";
 import Header from "../layouts/Header";
 
@@ -1092,7 +1092,7 @@ export default function WorkRequestForm() {
                         <>
                             {Number(selectedTemplate || "99") === 1 ||
                             Number(selectedTemplate || "99") === 99 ? (
-                                <AddressForm
+                                <PermissionForm
                                     userInfo={{
                                         userList,
                                         callback: callbackGiveUser,
