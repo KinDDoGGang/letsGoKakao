@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export function callAuthApi(api, methodType, params, token) {
   return new Promise((resolve, reject) => {
     let result = {};
@@ -58,29 +56,6 @@ export function callApi(api, params) {
       console.log("api call end");
     }
     return result;
-  });
-}
-
-export function callQuery(api, params) {
-  //   const result = [];
-  return new Promise((resolve, reject) => {
-    let result = [];
-    try {
-      fetch(api, {
-        method: "post",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ params }),
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          result = json;
-          resolve(result);
-        });
-    } catch (error) {
-      reject(error);
-    }
   });
 }
 
