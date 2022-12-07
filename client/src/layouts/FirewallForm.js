@@ -21,8 +21,10 @@ export default function FirewallForm({
                     </Typography>
                     <CustomInput
                         fullWidth
-                        inputRef={destinationInfo.destinationRef}
-                        callback={destinationInfo.callback}
+                        inputRef={
+                            destinationInfo && destinationInfo.destinationRef
+                        }
+                        callback={destinationInfo && destinationInfo.callback}
                         isLocationed={isLocationed}
                         placeText={"출발지 주소를 입력하세요"}
                         flag={"destination"}
@@ -34,8 +36,8 @@ export default function FirewallForm({
                     </Typography>
                     <CustomInput
                         fullWidth
-                        inputRef={sourceInfo.sourceRef}
-                        callback={sourceInfo.callback}
+                        inputRef={sourceInfo && sourceInfo.sourceRef}
+                        callback={sourceInfo && sourceInfo.callback}
                         isLocationed={isLocationed}
                         placeText={"도착지 주소를 입력하세요"}
                         flag={"source"}

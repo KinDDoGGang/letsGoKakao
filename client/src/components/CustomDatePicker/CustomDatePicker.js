@@ -24,12 +24,12 @@ export default function CustomDatePicker({
                 InputLabelProps={{ shrink: true }}
                 onChange={handleChange}
                 value={
-                    Object.keys(isLocationed).length > 0
+                    Object.keys(isLocationed || {}).length > 0
                         ? isLocationed["totList"]["data"]["date"]
                         : date
                 }
                 inputRef={wantDateRef}
-                disabled={Object.keys(isLocationed).length > 0}
+                disabled={Object.keys(isLocationed || {}).length > 0}
             />
         </form>
     );
