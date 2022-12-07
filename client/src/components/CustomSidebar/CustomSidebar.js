@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "../components/Sidebar.scss";
+import "../../css/Sidebar.scss";
 
 const sidebarNavItems = [
   {
@@ -19,7 +19,7 @@ const sidebarNavItems = [
   // 메뉴 추가 필요할 경우 아래 추가 작성
 ];
 
-const Sidebar = () => {
+const CustomSidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [stepHeight, setStepHeight] = useState(0);
   const sidebarRef = useRef();
@@ -79,4 +79,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default CustomSidebar;

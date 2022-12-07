@@ -45,8 +45,6 @@ export default function CustomDropdownList({
 
   const getFirewallData = () => {
     if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
-      console.log("fireWall in locationed data", isLocationed);
-
       const locationedMap = isLocationed["totList"];
 
       switch (flag) {

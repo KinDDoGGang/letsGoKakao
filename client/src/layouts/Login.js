@@ -52,7 +52,6 @@ export default function Login() {
 
   const joinKeyHandler = (e) => {
     e.preventDefault();
-    console.log("e >> event key", e);
   };
 
   const joinHandler = async (e) => {
@@ -88,10 +87,6 @@ export default function Login() {
       console.error(e);
     }
   };
-
-  useEffect(() => {
-    console.log("LoginPage render ...");
-  }, []);
 
   const onUserNameHandler = (e) => {
     setUserName(e.currentTarget.value);

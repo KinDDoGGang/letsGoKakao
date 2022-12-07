@@ -10,12 +10,29 @@ async function APIRequest(target) {
                         }
                     ).then((res) => res.json());
 
-        return new Promise(resolve => resolve(call));
+        return new Promise( resolve => resolve(call));
     }
 }
 
+async function APIAuthRequest(api, methodType, params, token) {
+    const data = {
+        method: methodType,
+        headers: {
+          "content-type": "application/json",
+          "Authorization": token,
+        },
+    };
+    
+    if (methodType === "POST") {
+        data.body = JSON.stringify(params);
+    }
+  
+    const call = fetch(api, data).then((res) => res.json())
+       
+    return new Promise( resolve => resolve(call));
+}
 
 
 module.exports = {
-    APIRequest
+    APIRequest, APIAuthRequest
 }

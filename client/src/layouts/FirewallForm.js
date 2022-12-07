@@ -12,9 +12,6 @@ export default function FirewallForm({
     sourceInfo,
     isLocationed,
 }) {
-
-  console.log("locationedData in addressForm", isLocationed);
-
   return (
     <>
       <Grid container spacing={3}>

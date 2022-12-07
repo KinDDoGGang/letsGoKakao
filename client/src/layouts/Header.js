@@ -18,9 +18,9 @@ export default function Header({pages,handleNavMenu, selectedTemplate, activeSte
     const {goApprovStep, goProgressStep, goFirewallApprovStep, goFirewallReviewerStep, goFirewallStep } = buttonFunctions
     return(
         <AppBar
-        position="static"
-        style={{ background: "#FFB400", width: "1070px" }}
-      >
+          position="static"
+          style={{ background: "#FFB400", width: "1070px" }}
+        >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

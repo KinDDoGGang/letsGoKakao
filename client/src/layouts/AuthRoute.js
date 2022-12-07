@@ -7,8 +7,6 @@ import WorkRequest from "./WorkRequest";
  * 
  */
 export default function AuthRoute({ path }) {
-  console.log("patth>>", path);
-
   return (
        <>
        <Routes>
