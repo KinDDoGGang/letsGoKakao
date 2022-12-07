@@ -25,6 +25,7 @@
     "boxicons": "2.1.1",
     "ckeditor5": "^35.3.2",
     "date-fns": "^2.0.0-beta.5",
+    "enzyme-adapter-react-16": "^1.15.7",
     "react": "^18.2.0",
     "react-bootstrap": "^2.6.0",
     "react-dom": "^18.2.0",
