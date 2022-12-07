@@ -8,29 +8,32 @@ export default function CustomInput({
   callback,
   isLocationed,
   placeText,
-  flag
+  flag,
 }) {
   const [txt, setTxt] = useState("");
   let locationedTxt = "";
-  
 
   const handleChange = (event) => {
-    setTxt(event.target.value);
-    callback(event.target.value);
+    setTxt(event.target.value || "");
+    callback(event.target.value || "");
   };
 
   useEffect(() => {
-      console.log('isLocationed in customInput >> ', isLocationed);
-    
-      if (Object.keys(isLocationed.state || {}).length > 0 &&  flag !== 'destination' && flag !== 'source') {
-          locationedTxt = isLocationed.state.title;
-      } else if (Object.keys(isLocationed).length > 0 &&  flag === 'destination') {
-          locationedTxt = isLocationed.totList.data.destination;
-      } else if (Object.keys(isLocationed).length > 0 && flag === 'source') {
-          locationedTxt = isLocationed.totList.data.source;
-      }
-      setTxt(locationedTxt);
-      callback(locationedTxt);
+    console.log("isLocationed in customInput >> ", isLocationed);
+
+    if (
+      Object.keys(isLocationed.state || {}).length > 0 &&
+      flag !== "destination" &&
+      flag !== "source"
+    ) {
+      locationedTxt = isLocationed.state.title;
+    } else if (Object.keys(isLocationed).length > 0 && flag === "destination") {
+      locationedTxt = isLocationed.totList.data.destination;
+    } else if (Object.keys(isLocationed).length > 0 && flag === "source") {
+      locationedTxt = isLocationed.totList.data.source;
+    }
+    setTxt(locationedTxt);
+    callback(locationedTxt);
   }, []);
 
   return (
@@ -42,6 +45,7 @@ export default function CustomInput({
       noValidate
       autoComplete="off"
     >
+      {console.log("isLocationed in render >> ", isLocationed)}
       <TextField
         id="outlined-basic"
         label={placeText}
@@ -49,7 +53,10 @@ export default function CustomInput({
         inputRef={inputRef}
         onChange={handleChange}
         value={locationedTxt || txt}
-        disabled={Object.keys(isLocationed.state || {}).length > 0 ||  ( (flag || '') !== '' && Object.keys(isLocationed).length > 0) }
+        disabled={
+          Object.keys(isLocationed.state || {}).length > 0 ||
+          ((flag || "") !== "" && Object.keys(isLocationed).length > 0)
+        }
       />
     </Box>
   );
