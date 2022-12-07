@@ -25,9 +25,7 @@ export function callAuthApi(api, methodType, params, token) {
       result = error;
       console.error("error", error);
       reject(error);
-    } finally {
-      console.log("api call end");
-    }
+    } 
     return result;
   });
 }
@@ -52,9 +50,7 @@ export function callApi(api, params) {
       result = error;
       console.error("error", error);
       reject(error);
-    } finally {
-      console.log("api call end");
-    }
+    } 
     return result;
   });
 }

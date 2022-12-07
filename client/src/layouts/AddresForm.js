@@ -15,24 +15,6 @@ export default function AddressForm({
   isLocationed,
 }) {
   const [reqDetails, setReqDetails] = useState("");
-
-  // const makeLocationedData = () => {
-  //   let locationedDetail, locationedDate;
-  //   if (Object.keys(isLocationed) > 0) {
-  //     locationedDetail = locationedObj["details"];
-  //     locationedDate = locationedObj["date"];
-
-  //     setReqDetails(locationedDetail);
-  //   }
-
-  //   return {
-  //     locationedDetail,
-  //     locationedDate,
-  //   };
-  // };
-
-  console.log("locationedData in addressForm", isLocationed);
-
   return (
     <>
       <Grid container spacing={3}>
@@ -64,19 +46,10 @@ export default function AddressForm({
                 ? isLocationed["totList"]["data"]["details"]
                 : reqDetails
             }
-            onReady={(editor) => {
-              console.log("Editor is ready to use!", editor);
-            }}
             onChange={(event, editor) => {
               const data = editor.getData();
               setReqDetails(data);
               reqDetailInfo.callback(data);
-            }}
-            onBlur={(event, editor) => {
-              console.log("Blur.", editor);
-            }}
-            onFocus={(event, editor) => {
-              console.log("Focus.", editor);
             }}
           />
         </Grid>

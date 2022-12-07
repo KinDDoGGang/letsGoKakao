@@ -355,7 +355,7 @@ export default function WorkRequestForm() {
 
   const handleNavMenu = (event) => {
     if (event.target.innerText.includes("HOME")) {
-      // home 버튼으로 이동할건지 컨펌창 노출필요 history("/")
+      history("/workRequest");
     } else if (event.target.innerText.includes("요청하기")) {
       history("/workRequest/workRequestForm");
     }
@@ -380,7 +380,6 @@ export default function WorkRequestForm() {
 
   // 제목 콜백
   const callbackTitle = (callbackTitle) => {
-    console.log("callbackTitle", callbackTitle);
     setTitle(callbackTitle);
   };
 
@@ -428,25 +427,21 @@ export default function WorkRequestForm() {
 
   // 요청내용 상세 콜백
   const callbackDetails = (callbackDetails) => {
-    console.log("callbackDetails", callbackDetails);
     setSelectedDetails(callbackDetails);
   };
 
   // 처리희망일자 콜백
   const callbackWantDate = (callbackWantDate) => {
-    console.log("callbackWantDate", callbackWantDate);
     setSelectedWantDate(callbackWantDate);
   };
 
   // 출발지IP 콜백
   const callbackDestination = (callbackDestination) => {
-    console.log("callbackDestination", callbackDestination);
     setSelectedDestination(callbackDestination);
   };
 
   // 도착지 IP 콜백
   const callbackSource = (callbackSource) => {
-    console.log("callbackSource", callbackSource);
     setSelectedSource(callbackSource);
   };
 
@@ -544,16 +539,12 @@ export default function WorkRequestForm() {
         let params = undefined;
         const columns = makeWorkRequestListColumn;
 
-        console.log('columns 없어?', columns)
-
         setAlertFlag({
           ...AlertFlag,
           showError: !AlertFlag.showError,
           backgroundColor: "#1565c0",
           message: "요청서를 성공적으로 제출하였습니다.",
         });
-
-        console.log("result 데이터 뭘까", result);
 
         /* 아무것도 없을 때 noRows >> rows: [], totList : [] */
         if (Object.keys(result).length > 0) {

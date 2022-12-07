@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import "./WorkRequest.css";
+import "../css/WorkRequest.css";
 import "boxicons/css/boxicons.min.css";
 import AppLayout from "../layouts/AppLayout";
 // import { useLocation } from "react-router-dom";
@@ -87,14 +87,11 @@ export default function WorkRequest() {
       token
     );
 
-    console.log("result workRequestList >>", result);
-
     const columns = makeWorkRequestListColumn;
 
     /* 아무것도 없을 때 noRows */
     if ((result["content"] || []).length > 0) {
       const rows = makeWorkRequestListRows(result["content"]);
-      console.log("result rows", rows);
 
       setWorkRequestList({ columns, rows, totList: result });
     } else {
@@ -111,8 +108,7 @@ export default function WorkRequest() {
       console.error(e);
     }
   }, []);
-  // const location = useLocation();
-  // console.log('location in header', location)
+  
   return (
     <>
       <AppLayout

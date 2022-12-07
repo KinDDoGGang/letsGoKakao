@@ -28,8 +28,6 @@ export default function WorkRequestFormList() {
   const history = useNavigate();
 
   useEffect(() => {
-    console.log("workRequestList >> ", workRequestList);
-    console.log("location data", location);
     selectRequestForm();
     
     // 요청서 작성 후 페이지이동이 아닌 메뉴 클릭 시 이동할 경우
@@ -63,15 +61,11 @@ export default function WorkRequestFormList() {
   const selectRequestForm = async () => {
     const token = localStorage.getItem("login-token") || "";
     const result = await callAuthApi("http://127.0.0.1:8080/api/requests","GET",{},token);
-
-    console.log("result workRequestList >>", result);
-
     const columns = makeWorkRequestListColumn;
 
     /* 아무것도 없을 때 noRows */
     if ((result["content"] || []).length > 0) {
       const rows = makeWorkRequestListRows(result["content"]);
-      console.log("result rows", rows);
 
       setWorkRequestList({ columns, rows, totList: result });
     } else {
@@ -96,7 +90,7 @@ export default function WorkRequestFormList() {
   
   const handleNavMenu = (event) => {
     if (event.target.innerText.includes("HOME")) {
-      // home 버튼으로 이동할건지 컨펌창 노출필요 history("/")
+      history("/workRequest");
     } else if (event.target.innerText.includes("목록")) {
       history("/workRequest/workRequestFormList");
     }
@@ -104,7 +98,6 @@ export default function WorkRequestFormList() {
 
   /* TODO 여기 cell 클릭 했을 때, data 뿌려주면서 상세화면으로 이동필요, 상세화면일 경우에는 승인 버튼도 존재할 수 있음 */
   const onCellClick = async (GridCellParams, e, callback) => {
-    console.log("GridCellParams", GridCellParams);
 
     /* TODO 1초에 지연시간이 있어서 로딩바 같은게 필요해보임 */
     const userList = await selectUserList();
@@ -156,8 +149,6 @@ export default function WorkRequestFormList() {
         },${firewall}`;
       }
     }
-
-    console.log("copiedGridCell", copiedGridCellParams);
 
     history("/workRequest/workRequestForm", {
       state: {

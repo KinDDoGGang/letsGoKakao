@@ -19,8 +19,6 @@ export default function CustomInput({
   };
 
   useEffect(() => {
-    console.log("isLocationed in customInput >> ", isLocationed);
-
     if (
       Object.keys(isLocationed.state || {}).length > 0 &&
       flag !== "destination" &&
@@ -45,7 +43,6 @@ export default function CustomInput({
       noValidate
       autoComplete="off"
     >
-      {console.log("isLocationed in render >> ", isLocationed)}
       <TextField
         id="outlined-basic"
         label={placeText}
