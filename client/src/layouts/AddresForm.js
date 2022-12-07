@@ -65,15 +65,12 @@ export default function AddressForm({
                 : reqDetails
             }
             onReady={(editor) => {
-              // You can store the "editor" and use when it is needed.
               console.log("Editor is ready to use!", editor);
             }}
             onChange={(event, editor) => {
               const data = editor.getData();
               setReqDetails(data);
               reqDetailInfo.callback(data);
-
-              console.log({ event, editor, data });
             }}
             onBlur={(event, editor) => {
               console.log("Blur.", editor);

@@ -15,7 +15,7 @@ export default function CustomDropdownList({
   dropdownRef,
   flag,
   isLocationed,
-  reqType
+  reqType,
 }) {
   const getTemplateData = () => {
     if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
@@ -24,54 +24,52 @@ export default function CustomDropdownList({
       switch (flag) {
         // 부여대상일 경우
         case "giveUser":
-          return (locationedMap["data"]["targetUsername"]);
+          return locationedMap["data"]["targetUsername"];
 
         case "template":
-          return (locationedMap["templateId"].includes("permission")
+          return locationedMap["templateId"].includes("permission")
             ? `1,${locationedMap["templateId"]}`
-            : `2,${locationedMap["templateId"]}`);
+            : `2,${locationedMap["templateId"]}`;
 
         case "assignee":
-          return (locationedMap["steps"][0]["assignee"]);
+          return locationedMap["steps"][0]["assignee"];
 
         case "operator":
-          return (locationedMap["steps"][1]["assignee"]);
+          return locationedMap["steps"][1]["assignee"];
 
-        default : 
-          return '';
+        default:
+          return "";
       }
     }
   };
 
   const getFirewallData = () => {
-
     if ((flag || "") !== "" && Object.keys(isLocationed || {}).length > 0) {
-      console.log('fireWall in locationed data', isLocationed);
+      console.log("fireWall in locationed data", isLocationed);
 
       const locationedMap = isLocationed["totList"];
-      
+
       switch (flag) {
         // 템플릿일 경우
         case "template":
-          return (locationedMap["templateId"].includes("permission")
+          return locationedMap["templateId"].includes("permission")
             ? `1,${locationedMap["templateId"]}`
-            : `2,${locationedMap["templateId"]}`);
+            : `2,${locationedMap["templateId"]}`;
 
         case "approve":
-          return (locationedMap["steps"][0]["assignee"]);
+          return locationedMap["steps"][0]["assignee"];
 
         case "reviewer":
-          return (locationedMap["steps"][1]["assignee"]);
+          return locationedMap["steps"][1]["assignee"];
 
         case "firewall":
-          return (locationedMap["steps"][2]["assignee"]);
+          return locationedMap["steps"][2]["assignee"];
 
-        default : 
-          return '';
+        default:
+          return "";
       }
-
     }
-  }
+  };
 
   const [template, setTemplate] = useState("");
 
@@ -96,14 +94,18 @@ export default function CustomDropdownList({
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">{placeText}</InputLabel>
         <Select
-            inputRef={dropdownRef}
-            value={reqType !== "firewall" ?  (getTemplateData() || template) : getFirewallData() || template}
-            label="select"
-            onChange={handleChange}
-            sx={{
-              "& > :not(style)": { m: mSize },
-            }}
-            disabled={!!flag && Object.keys(isLocationed || {}).length > 0}
+          inputRef={dropdownRef}
+          value={
+            reqType !== "firewall"
+              ? getTemplateData() || template
+              : getFirewallData() || template
+          }
+          label="select"
+          onChange={handleChange}
+          sx={{
+            "& > :not(style)": { m: mSize },
+          }}
+          disabled={!!flag && Object.keys(isLocationed || {}).length > 0}
         >
           {/* 현재 양식요청 Object, 사용자명 조회하는 string 타입으로 나뉘어짐 */}
           {(TemplateList || []).length > 0 && typeof TemplateList[0] == "object"
@@ -122,7 +124,6 @@ export default function CustomDropdownList({
                 );
               })}
         </Select>
-        <span></span>
       </FormControl>
     </Box>
   );

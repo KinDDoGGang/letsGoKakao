@@ -75,7 +75,7 @@ export default function Login() {
       } else {
         const username = result.username || "";
         const token = result.token || "";
-        
+
         localStorage.setItem("login-token", token);
         localStorage.setItem("login-user", username);
 
@@ -213,9 +213,9 @@ export default function Login() {
           </Button>
         </Form>
       </LoginWrap>
-      <LinkWrap to="/start">
+      {/* <LinkWrap to="/start">
         <ButtonWrap>카카오페이 홈페이지</ButtonWrap>
-      </LinkWrap>
+      </LinkWrap> */}
 
       {AlertFlag.showError && (
         <CustomSnackbar
